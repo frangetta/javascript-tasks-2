@@ -1,15 +1,22 @@
 'use strict';
+var phoneBook = [];
 
-var phoneBook; // Здесь вы храните записи как хотите
-
-/*
-   Функция добавления записи в телефонную книгу.
-   На вход может прийти что угодно, будьте осторожны.
-*/
 module.exports.add = function add(name, phone, email) {
-
-    // Ваша невероятная магия здесь
-
+    var phonePattern =
+    /^(((\+7|7)|(\+\d{2}))\s?)?(\(\d{3}\)|\d{3})\s?\d{3}[\-|\s]?\d[\-|\s]?\d{3}$/;
+    var emailPattern = /^[a-zA-zа-яА-Я]+\@[a-zA-zа-яА-Я]+(\.[a-zA-zа-яА-Я]+)+$/;
+    var nameIsValid = (typeof name == 'string');
+    var phoneIsValid = phonePattern.test(phone);
+    var emailIsValid = emailPattern.test(email);
+    var argumentsIsValid = nameIsValid && phoneIsValid && emailIsValid;
+    if (argumentsIsValid) {
+        phoneBook.push({
+            name: name,
+            phone: phone,
+            email: email
+        });
+    }
+    return argumentsIsValid;
 };
 
 /*
