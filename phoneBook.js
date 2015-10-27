@@ -4,7 +4,7 @@ var phoneBook = [];
 module.exports.add = function add(name, phone, email) {
     var phonePattern =
     /^(((\+7|7)|(\+\d{2}))\s?)?(\(\d{3}\)|\d{3})\s?\d{3}[\-|\s]?\d[\-|\s]?\d{3}$/;
-    var emailPattern = /^[a-zA-zа-яА-Я]+\@[a-zA-zа-яА-Я]+(\.[a-zA-zа-яА-Я]+)+$/;
+    var emailPattern = /^[a-zA-zа-яА-Я\d\-\.]+\@[a-zA-zа-яА-Я\-]+(\.[a-zA-zа-яА-Я]+)+$/;
     var nameIsValid = (typeof name == 'string');
     var phoneIsValid = phonePattern.test(phone);
     var emailIsValid = emailPattern.test(email);
@@ -19,23 +19,65 @@ module.exports.add = function add(name, phone, email) {
     return argumentsIsValid;
 };
 
-/*
-   Функция поиска записи в телефонную книгу.
-   Поиск ведется по всем полям.
-*/
 module.exports.find = function find(query) {
-
-    // Ваша удивительная магия здесь
-
+    var searchResult = search(query);
+    if (searchResult === -1) {
+        printPhoneBookRecord('all');
+    } else {
+        printPhoneBookRecord(searchResult);
+    }
 };
 
-/*
-   Функция удаления записи в телефонной книге.
-*/
+function search(query) {
+    if (!query) {
+        return -1;
+    } else {
+        var postionsArray = [];
+        for (var i = 0; i < phoneBook.length; i++) {
+            for (var key in phoneBook[i]) {
+                if (phoneBook[i][key].indexOf(query) >= 0) {
+                    postionsArray.push(i);
+                }
+            }
+        }
+        return postionsArray;
+    }
+}
+
+function printPhoneBookRecord(recordsToPrint) {
+    if (recordsToPrint === 'all') {
+        for (i = 0; i < phoneBook.length; i++) {
+            var output = '';
+            for (var key in phoneBook[i]) {
+                if (output != '') {
+                    output += '\, ';
+                }
+                output += phoneBook[i][key];
+            }
+            console.log(output);
+        }
+    } else {
+        for (var i = 0; i < recordsToPrint.length; i++) {
+            var output = '';
+            for (var key in phoneBook[recordsToPrint[i]]) {
+                if (output != '') {
+                    output += '\, ';
+                }
+                output += phoneBook[recordsToPrint[i]][key];
+            }
+            console.log(output);
+        }
+    }
+}
+
 module.exports.remove = function remove(query) {
-
-    // Ваша необьяснимая магия здесь
-
+    var searchResult = search(query);
+    if (searchResult != -1) {
+        for (var i = 0; i < searchResult.length; i++) {
+            delete phoneBook[searchResult[i]];
+        }
+        console.log('Удалено контактов: ' + searchResult.length);
+    }
 };
 
 /*
