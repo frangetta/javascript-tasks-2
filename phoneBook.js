@@ -5,7 +5,8 @@ module.exports.add = function add(name, phone, email) {
     var phonePattern =
     /^(((\+7|7)|(\+\d{2}))\s?)?(\(\d{3}\)|\d{3})\s?\d{3}[\-|\s]?\d[\-|\s]?\d{3}$/;
     var emailPattern = /^[a-zA-zа-яА-Я\d\-\.]+\@[a-zA-zа-яА-Я\-]+(\.[a-zA-zа-яА-Я]+)+$/;
-    var nameIsValid = (typeof name == 'string');
+    var emptyStringPattern = /^\s*$/;
+    var nameIsValid = (typeof name == 'string') && !emptyStringPattern.test(name);
     var phoneIsValid = phonePattern.test(phone);
     var emailIsValid = emailPattern.test(email);
     var argumentsIsValid = nameIsValid && phoneIsValid && emailIsValid;
@@ -21,7 +22,7 @@ module.exports.add = function add(name, phone, email) {
 
 module.exports.find = function find(query) {
     var searchResult = search(query);
-    if (searchResult === -1) {
+    if (searchResult === false) {
         printPhoneBookRecord('all');
     } else {
         printPhoneBookRecord(searchResult);
@@ -30,7 +31,7 @@ module.exports.find = function find(query) {
 
 function search(query) {
     if (!query) {
-        return -1;
+        return false;
     } else {
         var postionsArray = [];
         for (var i = 0; i < phoneBook.length; i++) {
@@ -72,9 +73,20 @@ function printPhoneBookRecord(recordsToPrint) {
 
 module.exports.remove = function remove(query) {
     var searchResult = search(query);
-    if (searchResult != -1) {
+    if (searchResult !== false) {
+        var positionsToRemove = searchResult.slice();
         for (var i = 0; i < searchResult.length; i++) {
-            delete phoneBook[searchResult[i]];
+            var removingPosition = positionsToRemove.shift();
+            if (removingPosition === 0) {
+                phoneBook.shift();
+            } else if (removingPosition === phoneBook.length) {
+                phoneBook.pop();
+            } else {
+                phoneBook.splice(removingPosition, 1);
+            }
+            for (var j = 0; j < positionsToRemove.length; j++) {
+                positionsToRemove[j]--;
+            }
         }
         console.log('Удалено контактов: ' + searchResult.length);
     }
