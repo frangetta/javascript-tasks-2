@@ -13,7 +13,7 @@ module.exports.add = function add(name, phone, email) {
     if (argumentsIsValid) {
         phoneBook.push({
             name: name,
-            phone: phone,
+            phone: cleanPhone(phone),
             email: email
         });
     }
@@ -23,11 +23,25 @@ module.exports.add = function add(name, phone, email) {
 module.exports.find = function find(query) {
     var searchResult = search(query);
     if (searchResult === false) {
-        printPhoneBookRecord('all');
+        print('all');
     } else {
-        printPhoneBookRecord(searchResult);
+        print(searchResult);
     }
 };
+
+function cleanPhone(phone) {
+    var clearPhone = phone.replace(/[\(\)\-\+\s]+/g, '');
+    if (clearPhone.length === 10) {
+        clearPhone = '7' + clearPhone;
+    }
+    return clearPhone;
+}
+
+
+function normalizePhone(phone) {
+    return '+' + phone.slice(0, -10) + ' (' + phone.slice(-10, -7) + ') ' +
+    phone.slice(-7, -4) + '-' + phone.slice(-4, -3) + '-' + phone.slice(-3);
+}
 
 function search(query) {
     if (!query) {
@@ -45,30 +59,21 @@ function search(query) {
     }
 }
 
-function printPhoneBookRecord(recordsToPrint) {
+function print(recordsToPrint) {
     if (recordsToPrint === 'all') {
-        for (i = 0; i < phoneBook.length; i++) {
-            var output = '';
-            for (var key in phoneBook[i]) {
-                if (output != '') {
-                    output += '\, ';
-                }
-                output += phoneBook[i][key];
-            }
-            console.log(output);
+        for (var i = 0; i < phoneBook.length; i++) {
+            printRecord(i);
         }
     } else {
         for (var i = 0; i < recordsToPrint.length; i++) {
-            var output = '';
-            for (var key in phoneBook[recordsToPrint[i]]) {
-                if (output != '') {
-                    output += '\, ';
-                }
-                output += phoneBook[recordsToPrint[i]][key];
-            }
-            console.log(output);
+            printRecord(recordsToPrint[i]);
         }
     }
+}
+
+function printRecord(recordId) {
+    var phone = normalizePhone(phoneBook[recordId]['phone']);
+    console.log(phoneBook[recordId]['name'] + ', ' + phone + ', ' + phoneBook[recordId]['email']);
 }
 
 module.exports.remove = function remove(query) {
