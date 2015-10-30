@@ -13,7 +13,7 @@ module.exports.add = function add(name, phone, email) {
     if (argumentsIsValid) {
         phoneBook.push({
             name: name,
-            phone: cleanPhone(phone),
+            phone: phone,
             email: email
         });
     }
@@ -30,13 +30,12 @@ module.exports.find = function find(query) {
 };
 
 function cleanPhone(phone) {
-    var clearPhone = phone.replace(/[\(\)\-\+\s]+/g, '');
+    var clearPhone = phone.replace(/\D/g, '');
     if (clearPhone.length === 10) {
         clearPhone = '7' + clearPhone;
     }
     return clearPhone;
 }
-
 
 function normalizePhone(phone) {
     return '+' + phone.slice(0, -10) + ' (' + phone.slice(-10, -7) + ') ' +
@@ -72,7 +71,8 @@ function print(recordsToPrint) {
 }
 
 function printRecord(recordId) {
-    var phone = normalizePhone(phoneBook[recordId]['phone']);
+    var phone = cleanPhone(phoneBook[recordId]['phone']);
+    phone = normalizePhone(phone);
     console.log(phoneBook[recordId]['name'] + ', ' + phone + ', ' + phoneBook[recordId]['email']);
 }
 
